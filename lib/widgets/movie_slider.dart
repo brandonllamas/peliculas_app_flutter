@@ -8,7 +8,6 @@ class MovieSlider extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: 250,
-      color: Colors.red,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -18,6 +17,9 @@ class MovieSlider extends StatelessWidget {
               'Populares',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
+          ),
+          SizedBox(
+            height: 3,
           ),
           Expanded(
             child: ListView.builder(
@@ -44,8 +46,33 @@ class _MoviePoster extends StatelessWidget {
     return Container(
       width: 130,
       height: 190,
-      color: Colors.green,
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      margin: EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              // print("tap text");
+              Navigator.pushNamed(context, 'details', arguments: 'movie-test');
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: const FadeInImage(
+                placeholder: AssetImage("assets/loading.gif"),
+                image: NetworkImage("https://via.placeholder.com/500x300"),
+                width: 350,
+                height: 190,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const Text(
+            "Star wars:dsadsaaddssddsdsdsdsdsdsddsssds",
+            maxLines: 2,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+          )
+        ],
+      ),
     );
   }
 }
