@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:peliculas_app/Models/models.dart';
 import 'package:peliculas_app/Models/seach_response.dart';
+import 'package:peliculas_app/helpers/debouncer.dart';
 
 //esta mda es la que hara las peticiones al servidor
 class MoviesProvider extends ChangeNotifier {
@@ -17,6 +19,16 @@ class MoviesProvider extends ChangeNotifier {
 
 // el int es para el id de a pelicula
   Map<int, List<Cast>> onMovieCast = {};
+
+  final StreamController<List<Movie>> _suggetionsStreamController =
+      new StreamController.broadcast();
+
+  Stream<List<Movie>> get suggetionStream =>
+      this._suggetionsStreamController.stream;
+
+  final debouncer = Debouncer(
+    duration: Duration(milliseconds: 500),
+  );
 
   int _popularPage = 0;
 
@@ -81,5 +93,23 @@ class MoviesProvider extends ChangeNotifier {
     final movieSearch = SearchResponse.fromRawJson(response.body);
 
     return movieSearch.results;
+  }
+
+  void getSuggetionsByQuery(String query) {
+    debouncer.value = "";
+
+    debouncer.onValue = (value) async {
+      // print("tenemos vlaor a buscar : $value");
+
+      final restulr = await this.seachMovies(value);
+
+      this._suggetionsStreamController.add(restulr);
+    };
+
+    final timer = Timer.periodic(Duration(microseconds: 300), (timer) {
+      debouncer.value = query;
+    });
+
+    Future.delayed(Duration(microseconds: 301)).then((value) => timer.cancel());
   }
 }
