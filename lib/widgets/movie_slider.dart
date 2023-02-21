@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:peliculas_app/Models/Movie.dart';
 
 class MovieSlider extends StatelessWidget {
-  const MovieSlider({super.key});
+  final List<Movie> movies;
+
+  const MovieSlider({super.key, required this.movies});
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +27,10 @@ class MovieSlider extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: 20,
+              itemCount: movies.length,
               itemBuilder: (context, index) {
-                return _MoviePoster();
+                final movie = movies[index];
+                return _MoviePoster(movie);
               },
             ),
           )
@@ -37,7 +41,10 @@ class MovieSlider extends StatelessWidget {
 }
 
 class _MoviePoster extends StatelessWidget {
-  const _MoviePoster({
+  final Movie movie;
+
+  const _MoviePoster(
+    this.movie, {
     super.key,
   });
 
@@ -56,17 +63,17 @@ class _MoviePoster extends StatelessWidget {
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: const FadeInImage(
-                placeholder: AssetImage("assets/loading.gif"),
-                image: NetworkImage("https://via.placeholder.com/500x300"),
+              child: FadeInImage(
+                placeholder: const AssetImage("assets/loading.gif"),
+                image: NetworkImage(movie.fullImg),
                 width: 350,
                 height: 190,
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          const Text(
-            "Star wars:dsadsaaddssddsdsdsdsdsdsddsssds",
+          Text(
+            "${movie.title}",
             maxLines: 2,
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
