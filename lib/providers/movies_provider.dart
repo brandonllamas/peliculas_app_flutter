@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,9 @@ class MoviesProvider extends ChangeNotifier {
 
   List<Movie> onDisplayMovie = [];
   List<Movie> onPopularMovie = [];
+
+// el int es para el id de a pelicula
+  Map<int, List<Cast>> onMovieCast = {};
 
   int _popularPage = 0;
 
@@ -51,5 +55,18 @@ class MoviesProvider extends ChangeNotifier {
     // OSEA pon las respuesta y mete el resto
     onPopularMovie = [...onPopularMovie, ...popularResponse.results];
     notifyListeners();
+  }
+
+  Future<List<Cast>> getMovieCast(int MovieId) async {
+    // revisar mapa
+    if (onMovieCast.containsKey(MovieId)) return onMovieCast[MovieId]!;
+
+    // pdiiendo e servidor
+    final jsonData = await this._getJsonData('/3/movie/${MovieId}/credits');
+    final creditRsponsed = Credits_Response.fromRawJson(jsonData);
+    print("llega cole");
+    onMovieCast[MovieId] = creditRsponsed.cast;
+
+    return creditRsponsed.cast;
   }
 }
