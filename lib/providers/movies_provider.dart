@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:peliculas_app/Models/models.dart';
+import 'package:peliculas_app/Models/seach_response.dart';
 
 //esta mda es la que hara las peticiones al servidor
 class MoviesProvider extends ChangeNotifier {
@@ -68,5 +69,17 @@ class MoviesProvider extends ChangeNotifier {
     onMovieCast[MovieId] = creditRsponsed.cast;
 
     return creditRsponsed.cast;
+  }
+
+  Future<List<Movie>> seachMovies(String query) async {
+    var url = Uri.https(_baseUrl, "3/search/movie", {
+      'api_key': _apikey,
+      'language': _language,
+      'query': '${query}',
+    });
+    final response = await http.get(url);
+    final movieSearch = SearchResponse.fromRawJson(response.body);
+
+    return movieSearch.results;
   }
 }
