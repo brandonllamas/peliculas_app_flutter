@@ -13,20 +13,28 @@ class MoviesProvider extends ChangeNotifier {
   List<Movie> onDisplayMovie = [];
   List<Movie> onPopularMovie = [];
 
+  int _popularPage = 0;
+
   MoviesProvider() {
     getDisplayMovies();
+    getPopularMovies();
   }
 
-  getDisplayMovies() async {
-    var url = Uri.https(_baseUrl, '3/movie/now_playing', {
+  Future<String> _getJsonData(String endpoint, [int page = 1]) async {
+    var url = Uri.https(_baseUrl, endpoint, {
       'api_key': _apikey,
       'language': _language,
-      'page': '1',
+      'page': '${page}',
     });
 
     // Await the http get response, then decode the json-formatted response.
     final response = await http.get(url);
-    final noewPlaying = NowPlayerResponse.fromRawJson(response.body);
+    return response.body;
+  }
+
+  getDisplayMovies() async {
+    final jsonData = await this._getJsonData('3/movie/now_playing');
+    final noewPlaying = NowPlayerResponse.fromRawJson(jsonData);
     // print(noewPlaying);
     onDisplayMovie = noewPlaying.results;
 
@@ -35,20 +43,13 @@ class MoviesProvider extends ChangeNotifier {
   }
 
   getPopularMovies() async {
-    var url = Uri.https(_baseUrl, '3/movie/popular', {
-      'api_key': _apikey,
-      'language': _language,
-      'page': '1',
-    });
+    _popularPage++;
+    final jsonData = await this._getJsonData('3/movie/popular', _popularPage);
 
-    // Await the http get response, then decode the json-formatted response.
-    final response = await http.get(url);
-    final popularResponse = PopularResponse.fromRawJson(response.body);
+    final popularResponse = PopularResponse.fromRawJson(jsonData);
     // print(noewPlaying);
     // OSEA pon las respuesta y mete el resto
     onPopularMovie = [...onPopularMovie, ...popularResponse.results];
-
-    // hey esto redibuja a los widget que utilicen esa mda
     notifyListeners();
   }
 }
