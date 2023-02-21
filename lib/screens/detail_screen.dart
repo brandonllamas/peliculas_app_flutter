@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
+import 'package:peliculas_app/Models/models.dart';
 import 'package:peliculas_app/widgets/casting_cards.dart';
 
 class DetailsScreen extends StatelessWidget {
   const DetailsScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final String movie =
-        ModalRoute.of(context)?.settings.arguments.toString() ?? "no-movie";
+    final Movie movie = ModalRoute.of(context)!.settings.arguments as Movie;
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          _customAppbar(),
+          _customAppbar(movie),
           SliverList(
-              delegate: SliverChildListDelegate(const [
-            _PosterAndTitle(),
+              delegate: SliverChildListDelegate([
+            _PosterAndTitle(movie),
             _Overriew(),
             _Overriew(),
             _Overriew(),
@@ -31,6 +31,10 @@ class DetailsScreen extends StatelessWidget {
 
 // barra que cuando se encoja sea igual a cualquier barra normal
 class _customAppbar extends StatelessWidget {
+  final Movie movie;
+
+  const _customAppbar(this.movie);
+
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
@@ -47,13 +51,13 @@ class _customAppbar extends StatelessWidget {
           alignment: Alignment.bottomCenter,
           color: Colors.black12,
           child: Text(
-            "Movie title",
+            this.movie.title,
             style: TextStyle(fontSize: 16),
           ),
         ),
         background: FadeInImage(
           placeholder: AssetImage("assets/loading.gif"),
-          image: NetworkImage("https://via.placeholder.com/300x400"),
+          image: NetworkImage(this.movie.fullImg),
           fit: BoxFit.cover,
         ),
       ),
@@ -62,55 +66,64 @@ class _customAppbar extends StatelessWidget {
 }
 
 class _PosterAndTitle extends StatelessWidget {
-  const _PosterAndTitle({super.key});
+  final Movie movie;
+  const _PosterAndTitle(
+    this.movie, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Container(
-      margin: EdgeInsets.only(top: 20),
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      margin: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: const FadeInImage(
-              placeholder: AssetImage('assets/no-image.jpg'),
-              image: NetworkImage("https://via.placeholder.com/200x300"),
+            child: FadeInImage(
+              placeholder: const AssetImage('assets/no-image.jpg'),
+              image: NetworkImage(this.movie.fullImg),
               height: 150,
             ),
           ),
           const SizedBox(
             width: 20,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Movie.title",
-                style: Theme.of(context).textTheme.headlineSmall,
-                overflow: TextOverflow.clip,
-                maxLines: 2,
-              ),
-              Text(
-                "Original name",
-                style: Theme.of(context).textTheme.bodySmall,
-                overflow: TextOverflow.clip,
-                maxLines: 1,
-              ),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.star_outline,
-                    size: 15,
-                    color: Colors.grey,
-                  ),
-                  Text(
-                    'movievoteavergare',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  )
-                ],
-              )
-            ],
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: size.width - 190),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  movie.title,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                  overflow: TextOverflow.clip,
+                  maxLines: 2,
+                ),
+                Text(
+                  movie.originalTitle,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  overflow: TextOverflow.clip,
+                  maxLines: 1,
+                ),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.star_outline,
+                      size: 15,
+                      color: Colors.grey,
+                    ),
+                    Text(
+                      "${movie.voteAverage}",
+                      style: Theme.of(context).textTheme.bodySmall,
+                    )
+                  ],
+                )
+              ],
+            ),
           )
         ],
       ),
@@ -119,8 +132,6 @@ class _PosterAndTitle extends StatelessWidget {
 }
 
 class _Overriew extends StatelessWidget {
-  const _Overriew({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Container(
