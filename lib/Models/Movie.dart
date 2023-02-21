@@ -35,6 +35,8 @@ class Movie {
   double voteAverage;
   int voteCount;
 
+  String? heroId;
+
   factory Movie.fromRawJson(String str) => Movie.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());

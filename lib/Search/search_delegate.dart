@@ -83,17 +83,21 @@ class _MovieItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    movie.heroId = "seach-delegate-${movie.id}";
     return ListTile(
       title: Text(movie.title),
       subtitle: Text(movie.originalTitle),
       onTap: () {
         Navigator.pushNamed(context, 'details', arguments: movie);
       },
-      leading: FadeInImage(
-          width: 50,
-          fit: BoxFit.contain,
-          placeholder: AssetImage('assets/no-image.jpg'),
-          image: NetworkImage(movie.fullImg)),
+      leading: Hero(
+        tag: movie.heroId!,
+        child: FadeInImage(
+            width: 50,
+            fit: BoxFit.contain,
+            placeholder: AssetImage('assets/no-image.jpg'),
+            image: NetworkImage(movie.fullImg)),
+      ),
     );
   }
 }
